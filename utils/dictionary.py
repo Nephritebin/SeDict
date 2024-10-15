@@ -123,3 +123,6 @@ class LongmanDictionary(Dictionary):
             'entries': entry_data
         }
 
+class VocabularyDictionary(Dictionary):
+    def _parse_html(self, html):
+        return html
