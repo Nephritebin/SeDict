@@ -46,13 +46,9 @@ def read_sentences(sentence):
     words = word_tokenize(sentence)
     pos_tags = pos_tag(words)
     transformed_words = [word.lower() if pos not in ('NNP', 'NNPS') else word
-        for word, pos in pos_tags
-    ]
+        for word, pos in pos_tags]
     words = [word for word in transformed_words if word.isalpha()]
-    
-    print(words)
     
     lemmatizer = WordNetLemmatizer()
     stemmed_words = [lemmatizer.lemmatize(word) for word in words]
     return stemmed_words
-    

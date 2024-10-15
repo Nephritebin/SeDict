@@ -26,7 +26,10 @@ class Dictionary:
             raise ValueError(f'[ERROR] Fail to open the dictionary: {len(headwords)}, {len(items)}')
     
     def search(self, word):
-        wordIndex = self.headwords.index(word.encode())
+        try:
+            wordIndex = self.headwords.index(word.encode())
+        except ValueError:
+            return -1  #
         word, html = self.items[wordIndex]
         word, html = word.decode(), html.decode()
         return self._parse_html(str(pq(html)))
