@@ -1,5 +1,7 @@
 */__pycache__/
 .vscode/
+
+# Ignore the compiled dictionaries and their metadata
 assets/Dictionaries/*/*.mdx
 assets/Dictionaries/*/*.mdd
 assets/Dictionaries/*/*.png

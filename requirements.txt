@@ -2,3 +2,6 @@ readmdict
 pyquery
 bs4
 nltk
+lxml 
+cssutils 
+cssselect
