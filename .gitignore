@@ -1,0 +1,6 @@
+*/__pycache__/
+.vscode/
+assets/Dictionaries/*/*.mdx
+assets/Dictionaries/*/*.mdd
+assets/Dictionaries/*/*.png
+assets/Dictionaries/*/*.ico

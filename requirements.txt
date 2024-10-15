@@ -1,0 +1,4 @@
+readmdict
+pyquery
+bs4
+nltk
