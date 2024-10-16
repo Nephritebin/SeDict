@@ -62,7 +62,7 @@ class COCADictionary(Dictionary):
         table_elements = soup.find_all('div', class_='table')
         
         if pos_elements == [] or rank_elements == [] or total_elements == [] or table_elements == []:
-            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            # print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1
         
         for i in range(len(pos_elements)):
@@ -144,7 +144,7 @@ class LongmanDictionary(Dictionary):
         
         return entry_data
     
-    def format_output(self, entries):
+    def format_output_printing(self, entries):
         for entry in entries:
             # Print pronunciation if available
             if 'pronunciation' in entry:
@@ -181,14 +181,17 @@ class VocabularyDictionary(Dictionary):
             print(f"The word is not found in the {self.dictionary_name} dictionary.")
             return -1
         if len(its_elements) != 1 or len(ai_elements) != 1:
-            raise NotImplementedError
+            # print(html)
+            # raise NotImplementedError
+            # TODO: Handle the case where there are multiple meanings and explanations
+            pass
         
         # Make the return data structure   
         entries = {'Meaning': its_elements[0].text.replace("\'", "'"),
                    'Explanation': ai_elements[0].text.replace("\'", "'")}
         return entries
     
-    def format_output(self, entry):
+    def format_output_printing(self, entry):
         for key in entry:
             print(f"{key}: {entry[key]}")
         print()

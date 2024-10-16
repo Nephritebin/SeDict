@@ -6,6 +6,11 @@ assets/Dictionaries/*/*.mdx
 assets/Dictionaries/*/*.mdd
 assets/Dictionaries/*/*.png
 assets/Dictionaries/*/*.ico
+
+# Ignore the compiled latex files
 assets/Latex Templates/*.pdf
 assets/Latex Templates/*.bbl
 assets/Latex Templates/*.synctex.gz
+
+# Ignore generated tex file
+assets/Contents/*

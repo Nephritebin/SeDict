@@ -73,10 +73,10 @@ def word_filter(word, coca=None):
     # Define the words to be filtered
     extracted_data = coca.search(word)
     if extracted_data == -1:
-        return True
+        return False
     
     # If the rank of the words is greater than 4000, return True
-    if extracted_data['rank'] > 2000:
+    if extracted_data['rank'] > 1000:
         return True
     return False
 
@@ -88,4 +88,21 @@ def format_dictionary(result_dict, dict_list):
         if result_dict['result'][i] == -1:
             continue
         dict_list[i].format_output(result_dict['result'][i])
+        
+# These two functions come from the latex template file.
+# TODO: Find a better way to load the format from the template file.
+def write_sentence_to_latex(sentence, results, output_file):
+    with open(output_file, 'a', encoding='utf-8') as file:
+        file.write("\\clearpage\n\\noindent\n")
+        file.write("\\colorbox{bgcolor}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\n")        
+        file.write(f"{sentence}\n")
+        file.write("}}\\vspace{0.5cm}\\noindent\n\n")
+    for result in results:
+        if result['result'][0] != -1 or result['result'][1] != -1:
+            write_word_to_latex(result, output_file)
+            
+def write_word_to_latex(result_dict, output_file):
+    with open(output_file, 'a', encoding='utf-8') as file:
+        file.write(f"\\textbf{{Word:}} {result_dict['word']}\\\\\n")
+    #TODO: finish this part
         
