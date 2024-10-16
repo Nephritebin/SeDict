@@ -5,3 +5,4 @@ nltk
 lxml 
 cssutils 
 cssselect
+python-lzo

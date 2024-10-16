@@ -6,3 +6,6 @@ assets/Dictionaries/*/*.mdx
 assets/Dictionaries/*/*.mdd
 assets/Dictionaries/*/*.png
 assets/Dictionaries/*/*.ico
+assets/Latex Templates/*.pdf
+assets/Latex Templates/*.bbl
+assets/Latex Templates/*.synctex.gz

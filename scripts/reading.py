@@ -5,25 +5,23 @@ import sys
 sys.path.append(os.getcwd())
 from utils.dictionary import *
 from utils.helper import *
+from utils.word import *
 
+
+coca = COCADictionary('assets/Dictionaries/COCA')
+sentences = read_paragraphs('assets/Materials/sentences.txt')
 
 longman = LongmanDictionary('assets/Dictionaries/Longman')
-# vocabulary = VocabularyDictionary('assets/Dictionaries/Vocabulary')
-# coca = COCADictionary('assets/Dictionaries/COCA')
+vocabulary = VocabularyDictionary('assets/Dictionaries/Vocabulary')
+dict_list = [longman, vocabulary]
 
-# queryWord = 'sophisticated'
-# extracted_data = longman.search(queryWord)
-# print(json.dumps(extracted_data, indent=4, ensure_ascii=False))
+for sentence in sentences[:1]:
+    print(sentence)
+    words = list(set(read_sentence(sentence)))
+    words = [i for i in words if word_filter(i, coca)]
 
-sentences = read_paragraphs('assets/Materials/sentences.txt')
-se = sentences[2]
-words = read_sentences(se)
-
-# for i in words:
-#     print(i)
-#     extracted_data = longman.search(i)
-#     if extracted_data != -1:
-#         print(json.dumps(extracted_data, indent=4, ensure_ascii=False))
-extracted_data = longman.search("starting")
-#TODO: Fix this problem
-
+    for i in words:
+        print(i)
+        result_dict = {'word': i}
+        result_dict['result'] = [dict.search(i) for dict in dict_list]
+        format_dictionary(result_dict, dict_list)

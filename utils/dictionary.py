@@ -7,18 +7,19 @@ from bs4 import BeautifulSoup
 
 from utils.helper import *
 
-
 class Dictionary:
-    def __init__(self, filename, with_voice=False):
+    def __init__(self, filename):
+        self.dictionary_name = os.path.basename(filename)
         self.filename = get_absolute_path(filename)
         self.mdx_filename = find_files(self.filename, '*.mdx')
         self.load()
+        self.attributes = {}
 
     def load(self):
         headwords = [*MDX(self.mdx_filename)]     
         items = [*MDX(self.mdx_filename).items()]
         if len(headwords)==len(items):
-            print(f'Successfully load the dictionary, we have {len(headwords)} items.')
+            print(f'Successfully load {self.dictionary_name} dictionary, we have {len(headwords)} items.')
             self.items_num = len(headwords)
             self.headwords = headwords
             self.items = items
@@ -29,6 +30,7 @@ class Dictionary:
         try:
             wordIndex = self.headwords.index(word.encode())
         except ValueError:
+            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1  #
         word, html = self.items[wordIndex]
         word, html = word.decode(), html.decode()
@@ -36,19 +38,32 @@ class Dictionary:
     
     # Waiting for inheriting classes to implement
     def _parse_html(self, html):
+        raise NotImplementedError
+        pass
+    
+    def format_output(self, entry):
+        raise NotImplementedError
+        pass
+    
+    def result_to_latex(self, entry):
+        raise NotImplementedError
         pass
 
 class COCADictionary(Dictionary):
     def _parse_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         word = soup.find('div', class_='word').text
-        entries = []
+        entry = None
         
-        # Find all positions, ranks, total frequencies and frequency tables
+        # Parse the html file and filter some not found cases specifically
         pos_elements = soup.find_all('span', class_='pos')
         rank_elements = soup.find_all('span', class_='rank')
         total_elements = soup.find_all('div', class_='total')
         table_elements = soup.find_all('div', class_='table')
+        
+        if pos_elements == [] or rank_elements == [] or total_elements == [] or table_elements == []:
+            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            return -1
         
         for i in range(len(pos_elements)):
             pos = pos_elements[i].text
@@ -61,26 +76,32 @@ class COCADictionary(Dictionary):
                 frequency = int(category_div.find('div', class_='freq').text)
                 frequencies[category_name] = frequency
 
-            entries.append({
-                'part_of_speech': pos,
-                'rank': rank,
-                'total_frequency': total_frequency,
-                'frequencies': frequencies
-            })
+            # Should I only take the largest one?
+            # TODO: Use the pos tag to filter the frequency
+            if entry is None or entry['rank'] > rank:
+                entry = {
+                    'part_of_speech': pos,
+                    'rank': rank,
+                    'total_frequency': total_frequency,
+                    'frequencies': frequencies}
 
-        data = {
-            'word': word,
-            'entries': entries
-        }
-        
-        return data
+        return entry
 
 class LongmanDictionary(Dictionary):
+    
+    def __init__(self, filename):
+        super().__init__(filename)
+        self.attributes = ['pronunciation', ['part_of_speech', ['senses', ['definition', 'examples']]]]
+        
     def _parse_html(self, html):
         soup = BeautifulSoup(html, 'html.parser')
-        
+            
         # Extract the word name
-        word = soup.find('h1', class_='pagetitle').text
+        word = soup.find('h1', class_='pagetitle')
+        if word is None:
+            print(f"The word is not found in the {self.dictionary_name} dictionary.")
+            return -1
+        word = word.text
         
         # Extract pronunciation and frequency information
         entry_data = []
@@ -121,11 +142,53 @@ class LongmanDictionary(Dictionary):
             
             entry_data.append(entry_info)
         
-        return {
-            'word': word,
-            'entries': entry_data
-        }
+        return entry_data
+    
+    def format_output(self, entries):
+        for entry in entries:
+            # Print pronunciation if available
+            if 'pronunciation' in entry:
+                print(f"Word: {entry.get('pronunciation').capitalize()}\n")
+            
+            part_of_speech = entry.get('part_of_speech', 'Unknown')
+            print(f"Part of Speech: {part_of_speech.capitalize()}\n")
+
+            for i, sense in enumerate(entry.get('senses', []), 1):
+                definition = sense.get('definition', 'No definition provided')
+                print(f"{i}. Definition: {definition}")
+                
+                examples = sense.get('examples', [])
+                if examples:
+                    print("   Examples:")
+                    for example in examples:
+                        print(f"   - {example}")
+                print() 
 
 class VocabularyDictionary(Dictionary):
+    
+    def __init__(self, filename):
+        super().__init__(filename)
+        self.attributes = ['meaning', 'explanation']
+        
     def _parse_html(self, html):
-        return html
+        soup = BeautifulSoup(html, 'lxml')
+
+        # Parse the html file and filter some not found cases specifically
+        its_elements = soup.find_all(class_='i t s')
+        ai_elements = soup.find_all(class_='a i')
+        
+        if len(its_elements) == 0 or len(ai_elements) == 0:
+            print(f"The word is not found in the {self.dictionary_name} dictionary.")
+            return -1
+        if len(its_elements) != 1 or len(ai_elements) != 1:
+            raise NotImplementedError
+        
+        # Make the return data structure   
+        entries = {'Meaning': its_elements[0].text.replace("\'", "'"),
+                   'Explanation': ai_elements[0].text.replace("\'", "'")}
+        return entries
+    
+    def format_output(self, entry):
+        for key in entry:
+            print(f"{key}: {entry[key]}")
+        print()

@@ -1,0 +1,84 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage{ctex}
+\usepackage{xcolor}
+\usepackage{lipsum} % For placeholder text, can be removed
+\usepackage{fancyhdr} % For headers and footers
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% === Preamble Style Definitions ===
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{parskip}
+\tcbuselibrary{breakable}
+\usepackage{enumitem}
+
+% Define colors
+\definecolor{titlecolor}{RGB}{0, 102, 102}
+\definecolor{lightbgcolor}{RGB}{230, 246, 255}
+\definecolor{textcolor}{RGB}{51, 51, 51}
+\definecolor{examplecolor}{RGB}{0, 51, 102}
+
+\newtcolorbox{contentbox}[1]{breakable, colback=lightbgcolor, colframe=titlecolor, boxrule=0.5pt, fonttitle=\bfseries\sffamily\LARGE, title=#1}
+
+% Change global text color
+\AtBeginDocument{\color{textcolor}}
+% === End of Style Definitions ===
+
+
+% Adjusting titles and text
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\color{headingcolor}}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{headingcolor}}{}{0em}{}
+
+% Define colors
+\definecolor{coverblue}{rgb}{0.1, 0.2, 0.7}
+\definecolor{textgray}{rgb}{0.3, 0.3, 0.3}
+\definecolor{bgcolor}{rgb}{0.94, 0.97, 1.0}
+\definecolor{examplecolor}{rgb}{0, 0, 0}
+\definecolor{headingcolor}{rgb}{0, 0, 0}
+
+\newcommand{\booktitle}{English Reading Notes}
+\newcommand{\authorname}{Author Name}
+\newcommand{\yourname}{Nephrite}
+
+\begin{document}
+\setlist{nosep} % Remove extra spacing in lists
+
+% Cover page with decorative elements
+\begin{titlepage}
+    \begin{center}
+        \vspace*{2cm}
+
+        % Decorative line
+        \hrule height 3pt \vspace{2pt} \hrule height 1pt width 0.4\textwidth \vspace{1cm}
+
+        % Main Title
+        {\Huge \textbf{\textcolor{coverblue}{\booktitle}}}\\[0.5cm]
+
+        % Subtitle or Author
+        {\LARGE \textit{\textcolor{textgray}{\authorname}}}\\[1cm]
+
+        % More decoration
+        \hrule height 1pt \vspace{2pt} \hrule height 3pt \vspace{3cm}
+
+        % Notebook Owner
+        {\Large \textcolor{textgray}{Notes Compiled by}}\\[0.5cm]
+        {\LARGE \textbf{\yourname}}\\[2cm]
+
+        % Final decorative element
+        \vfill
+        \hrule height 1pt width 0.25\textwidth
+    \end{center}
+\end{titlepage}
+
+% Table of Contents
+\tableofcontents
+\newpage
+
+% Main content from external files
+\chapter{Some difficult sentences in GRE}
+% \addcontentsline{toc}{chapter}{Reading Notes} % Add to TOC
+\input{../Contents/example} % This will include the main text and notes
+
+\end{document}
