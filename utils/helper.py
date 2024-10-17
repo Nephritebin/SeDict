@@ -152,10 +152,10 @@ def symbols_to_latex(text):
 
 def generate_pdf_from_html_string(html_content, output_pdf):
     # Create an HTML object from a string
-    html = HTML(string=html_content)
+    html = HTML(string=html_content, base_url="assets\Dictionaries\Vocabulary")
     
     # Write the PDF to the specified file
-    html.write_pdf(output_pdf)
+    html.write_pdf(target=output_pdf)
 
 
         
