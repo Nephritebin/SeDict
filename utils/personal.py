@@ -25,7 +25,7 @@ learned_words = load_learned_words('assets/Materials/learned_words.txt')
 
 # Define the threshold for the words
 # Noun, Verb, Adjective, Adverb, Conjunction
-threshold = {'n': 5000, 'v': 5000, 'j': 4000, 'r': 3000, 'c': 300} 
+threshold = {'n': 3000, 'v': 3000, 'j': 3000, 'r': 3000, 'c': 1000} 
 
 
 def word_filter(word, coca=None):
@@ -39,7 +39,7 @@ def word_filter(word, coca=None):
         return True
     
     # Infinitive marker, determiner, preposition, article
-    if extracted_data['part_of_speech'] in ('i', 'd', 'p', 'a', 't', 'x'):
+    if extracted_data['part_of_speech'] in ('i', 'd', 'p', 'a', 't', 'x', 'm', 'e'):
         return False
     
     # If the rank of the words is greater than threshold, return True

@@ -6,3 +6,4 @@ lxml
 cssutils 
 cssselect
 python-lzo
+weasyprint

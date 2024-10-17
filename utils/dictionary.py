@@ -78,7 +78,6 @@ class COCADictionary(Dictionary):
 
             # Should I only take the largest one?
             # TODO: Use the pos tag to filter the frequency
-            print(word, pos)
             if entry is None or entry['rank'] > rank:
                 entry = {
                     'part_of_speech': pos,

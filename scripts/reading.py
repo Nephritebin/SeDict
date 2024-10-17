@@ -8,7 +8,6 @@ from collections import OrderedDict
 sys.path.append(os.getcwd())
 from utils.dictionary import *
 from utils.helper import *
-from utils.word import *
 from utils.personal import word_filter, read_paragraph
 
 input_file = 'assets/Materials/paper_reading.txt'
@@ -23,8 +22,8 @@ except FileNotFoundError:
 coca = COCADictionary('assets/Dictionaries/COCA')
 longman = LongmanDictionary('assets/Dictionaries/Longman')
 vocabulary = VocabularyDictionary('assets/Dictionaries/Vocabulary')
+# dict_list = []
 dict_list = [vocabulary, longman]
-# dict_list = [vocabulary]
 
 paragraphs = read_essay(input_file)
 for paragraph in tqdm(paragraphs):

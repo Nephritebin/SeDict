@@ -3,6 +3,7 @@ import fnmatch
 import subprocess
 import re
 
+from weasyprint import HTML
 import nltk
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
@@ -91,15 +92,26 @@ def result_exist(result_dict):
             return True
     return False
 
+def add_around_substring(text, target, prefix, suffix):
+    # Directly replace the target with prefix and suffix added
+    modified_text = text.replace(target, f'{prefix}{target}{suffix}')
+    return modified_text
+
 def write_paragraph_to_latex(sentence, results, output_file, dict_list):
     with open(output_file, 'a', encoding='utf-8') as file:
+        
+        word_list = [result['word'] for result in results if result_exist(result)]
+        for i in word_list:
+            sentence = add_around_substring(sentence, i, '\\textbf{', '}')
+        word_string = ', '.join(word_list)
+        
         file.write("\\clearpage\n\\noindent\n")
         file.write("\\colorbox{bgcolor}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\n")        
         file.write(f"{sentence}\n")
         file.write("}}\\vspace{0.5cm}\\noindent\n\n")
         
         # Add the word list and explanations
-        word_string = ', '.join([result['word'] for result in results if result_exist(result)])
+
         file.write(f"\\textbf{{Word:}} {word_string}\\\\\n\n")
     for result in results:
         if result_exist(result):
@@ -137,6 +149,13 @@ def symbols_to_latex(text):
     cleaned_text = pattern.sub('', text)
         
     return cleaned_text
+
+def generate_pdf_from_html_string(html_content, output_pdf):
+    # Create an HTML object from a string
+    html = HTML(string=html_content)
+    
+    # Write the PDF to the specified file
+    html.write_pdf(output_pdf)
 
 
         

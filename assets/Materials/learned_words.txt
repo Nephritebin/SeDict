@@ -1,3 +1,5 @@
 robot
 an
 equation
+pathway
+analogy
