@@ -34,10 +34,10 @@ class Dictionary:
             return -1  #
         word, html = self.items[wordIndex]
         word, html = word.decode(), html.decode()
-        return self._parse_html(str(pq(html)))
+        return self._parse_html(str(pq(html)), word)
     
     # Waiting for inheriting classes to implement
-    def _parse_html(self, html):
+    def _parse_html(self, html, word):
         raise NotImplementedError
         pass
     
@@ -50,7 +50,7 @@ class Dictionary:
         pass
 
 class COCADictionary(Dictionary):
-    def _parse_html(self, html):
+    def _parse_html(self, html, word):
         soup = BeautifulSoup(html, 'html.parser')
         word = soup.find('div', class_='word').text
         entry = None
@@ -78,6 +78,7 @@ class COCADictionary(Dictionary):
 
             # Should I only take the largest one?
             # TODO: Use the pos tag to filter the frequency
+            print(word, pos)
             if entry is None or entry['rank'] > rank:
                 entry = {
                     'part_of_speech': pos,
@@ -87,19 +88,58 @@ class COCADictionary(Dictionary):
 
         return entry
 
+class VocabularyDictionary(Dictionary):
+    
+    def __init__(self, filename):
+        super().__init__(filename)
+        self.attributes = ['meaning', 'explanation']
+        
+    def _parse_html(self, html, word):
+        soup = BeautifulSoup(html, 'lxml')
+
+        # Parse the html file and filter some not found cases specifically
+        its_elements = soup.find_all(class_='i t s')
+        ai_elements = soup.find_all(class_='a i')
+        
+        if len(its_elements) == 0 or len(ai_elements) == 0:
+            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            return -1
+        if len(its_elements) != 1 or len(ai_elements) != 1:
+            # print(html)
+            # raise NotImplementedError
+            # TODO: Handle the case where there are multiple meanings and explanations
+            pass
+        
+        # Make the return data structure   
+        entries = {'Meaning': its_elements[0].text.replace("\'", "'"),
+                   'Explanation': ai_elements[0].text.replace("\'", "'")}
+        return entries
+    
+    def format_output_printing(self, entry):
+        for key in entry:
+            print(f"{key}: {entry[key]}")
+        print()
+        
+    def result_to_latex(self, word, result):
+        latex_string = f'\\begin{{contentbox}}{{' + word + f'}}\n'
+        latex_string += f'{result["Meaning"]}\n\n' + f'\\vspace{{0.5cm}}\n\n' + f'{result["Explanation"]}\n'
+        latex_string += f'\\end{{contentbox}}\n'
+    
+        return latex_string
+    
 class LongmanDictionary(Dictionary):
     
     def __init__(self, filename):
         super().__init__(filename)
         self.attributes = ['pronunciation', ['part_of_speech', ['senses', ['definition', 'examples']]]]
         
-    def _parse_html(self, html):
+    def _parse_html(self, html, word):
         soup = BeautifulSoup(html, 'html.parser')
             
         # Extract the word name
         word = soup.find('h1', class_='pagetitle')
         if word is None:
-            print(f"The word is not found in the {self.dictionary_name} dictionary.")
+            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1
         word = word.text
         
@@ -163,35 +203,25 @@ class LongmanDictionary(Dictionary):
                     for example in examples:
                         print(f"   - {example}")
                 print() 
-
-class VocabularyDictionary(Dictionary):
+                
+    def result_to_latex(self, word, entries):
+        latex_string = ''
+        for entry in entries:
+            latex_string += f'\\noindent\\textbf{{' + word + f'}}: '
+            if 'part_of_speech' in list(entry.keys()):
+                latex_string +=  f'\\textbf{{' + entry["part_of_speech"].capitalize() + f'}}\n'
+            else:
+                latex_string += '\n'
+                
+            latex_string += f'\\begin{{enumerate}}[leftmargin=*, topsep=0pt]\n'
+            for sence in entry['senses']:
+                latex_string += f'\\item \\textit{{{sence["definition"]}}}\n'
+                if sence['examples']:
+                    latex_string += f'\\textcolor{{examplecolor}}{{\n'
+                    latex_string += f'\\begin{{itemize}}[leftmargin=*, topsep=0pt]\n'
+                    for example in sence['examples']:
+                        latex_string += f'\\item {symbols_to_latex(example)}\n'
+                    latex_string += f'\\end{{itemize}}\n}}\n'
+            latex_string += f'\\end{{enumerate}}\n\n'
     
-    def __init__(self, filename):
-        super().__init__(filename)
-        self.attributes = ['meaning', 'explanation']
-        
-    def _parse_html(self, html):
-        soup = BeautifulSoup(html, 'lxml')
-
-        # Parse the html file and filter some not found cases specifically
-        its_elements = soup.find_all(class_='i t s')
-        ai_elements = soup.find_all(class_='a i')
-        
-        if len(its_elements) == 0 or len(ai_elements) == 0:
-            print(f"The word is not found in the {self.dictionary_name} dictionary.")
-            return -1
-        if len(its_elements) != 1 or len(ai_elements) != 1:
-            # print(html)
-            # raise NotImplementedError
-            # TODO: Handle the case where there are multiple meanings and explanations
-            pass
-        
-        # Make the return data structure   
-        entries = {'Meaning': its_elements[0].text.replace("\'", "'"),
-                   'Explanation': ai_elements[0].text.replace("\'", "'")}
-        return entries
-    
-    def format_output_printing(self, entry):
-        for key in entry:
-            print(f"{key}: {entry[key]}")
-        print()
+        return latex_string
