@@ -4,8 +4,14 @@ This project is going to help you generate a pdf file automatically with a input
 
 We use the [COCA]() dataset to check the frequency of the words, and then filter the high frequency words in default. You can also set the frequency threshold or the filtering algorithm by yourself.
 
+### Installation
+You need to install [Conda]() first. Then create a new environment and install the requirements. I also highly recommend you install [texlive](), which is used to generate the pdf file. Or you can use Overleaf for tex compiling.
+
+```
+conda create -n language python=3.8
 pip install -r requirements.txt
 conda install -c conda-forge weasyprint
+```
 
 ### Bug Fix
 

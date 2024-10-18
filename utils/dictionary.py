@@ -12,6 +12,13 @@ class Dictionary:
         self.dictionary_name = os.path.basename(filename)
         self.filename = get_absolute_path(filename)
         self.mdx_filename = find_files(self.filename, '*.mdx')
+        
+        if len(self.mdx_filename) == 0:
+            raise FileNotFoundError(f"No MDX files found in the directory: {filename}")
+        if len(self.mdx_filename) > 1:
+            raise ValueError(f"Multiple MDX files found in the directory: {filename}")
+        self.mdx_filename = self.mdx_filename[0]
+    
         self.load()
         self.attributes = {}
 
@@ -35,6 +42,10 @@ class Dictionary:
         word, html = self.items[wordIndex]
         word, html = word.decode(), html.decode()
         return self._parse_html(str(pq(html)), word)
+    
+    def _parse_html_to_pdf(self, html, word):
+        output_pdf = f'assets\\Output\\{self.dictionary_name}_{word}.pdf'
+        generate_pdf_from_html_string(html, output_pdf, self.filename)
     
     # Waiting for inheriting classes to implement
     def _parse_html(self, html, word):
@@ -94,6 +105,7 @@ class VocabularyDictionary(Dictionary):
         self.attributes = ['meaning', 'explanation']
         
     def _parse_html(self, html, word):
+        
         soup = BeautifulSoup(html, 'lxml')
 
         # Parse the html file and filter some not found cases specifically
@@ -121,7 +133,7 @@ class VocabularyDictionary(Dictionary):
         
     def result_to_latex(self, word, result):
         latex_string = f'\\begin{{contentbox}}{{' + word + f'}}\n'
-        latex_string += f'{result["Meaning"]}\n\n' + f'\\vspace{{0.5cm}}\n\n' + f'{result["Explanation"]}\n'
+        latex_string += f'{symbols_to_latex(result["Meaning"])}\n\n' + f'\\vspace{{0.5cm}}\n\n' + f'{symbols_to_latex(result["Explanation"])}\n'
         latex_string += f'\\end{{contentbox}}\n'
     
         return latex_string
@@ -214,7 +226,7 @@ class LongmanDictionary(Dictionary):
                 
             latex_string += f'\\begin{{enumerate}}[leftmargin=*, topsep=0pt]\n'
             for sence in entry['senses']:
-                latex_string += f'\\item \\textit{{{sence["definition"]}}}\n'
+                latex_string += f'\\item \\textit{{{symbols_to_latex(sence["definition"])}}}\n'
                 if sence['examples']:
                     latex_string += f'\\textcolor{{examplecolor}}{{\n'
                     latex_string += f'\\begin{{itemize}}[leftmargin=*, topsep=0pt]\n'
@@ -224,3 +236,14 @@ class LongmanDictionary(Dictionary):
             latex_string += f'\\end{{enumerate}}\n\n'
     
         return latex_string
+    
+class OxfordDictionary(Dictionary):
+    
+    def __init__(self, filename):
+        super().__init__(filename)
+        self.attributes = ['meaning', 'explanation']
+        
+    def _parse_html(self, html, word):
+        return super()._parse_html_to_pdf(html, word)
+        
+

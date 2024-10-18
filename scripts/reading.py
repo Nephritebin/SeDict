@@ -2,7 +2,6 @@ import json
 import os
 import sys
 from tqdm import tqdm
-from collections import OrderedDict
 
 
 sys.path.append(os.getcwd())
@@ -21,18 +20,22 @@ except FileNotFoundError:
 # Load coca dataset and dictionaries
 coca = COCADictionary('assets/Dictionaries/COCA')
 longman = LongmanDictionary('assets/Dictionaries/Longman')
-vocabulary = VocabularyDictionary('assets/Dictionaries/Vocabulary')
+# vocabulary = VocabularyDictionary('assets/Dictionaries/Vocabulary')
+oxford = OxfordDictionary('assets/Dictionaries/Oxford')
 # dict_list = []
-dict_list = [vocabulary, longman]
+dict_list = [oxford]
 
+current_words= []
 paragraphs = read_essay(input_file)
-for paragraph in tqdm(paragraphs):
+for paragraph in tqdm(paragraphs[:4]):
     words = list(dict.fromkeys(read_paragraph(paragraph)))
-    words = [i for i in words if word_filter(i, coca)]
+    if len(words) == 0:
+        continue
+    words = [i for i in words if word_filter(i, coca, current_words)]
+    current_words = list(dict.fromkeys(current_words + words))
     results = []
     for i in words:
         result_dict = {'word': i, 'result': [dict.search(i) for dict in dict_list]}
-        results.append(result_dict)
-    write_paragraph_to_latex(paragraph, results, output_file, dict_list)
+    #     results.append(result_dict)
+    # write_paragraph_to_latex(paragraph, results, output_file, dict_list)
 
-# TODO: Use python to compile the Latex automatically

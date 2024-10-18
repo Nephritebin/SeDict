@@ -45,11 +45,7 @@ def find_files(directory, pattern='*.mdx'):
         for filename in fnmatch.filter(files, pattern):
             # Construct the absolute path and append it to the list
             mdx_files.append(os.path.abspath(os.path.join(root, filename)))
-    if len(mdx_files) == 0:
-        raise FileNotFoundError(f"No MDX files found in the directory: {directory}")
-    if len(mdx_files) > 1:
-        raise ValueError(f"Multiple MDX files found in the directory: {directory}")
-    return mdx_files[0]
+    return mdx_files
 
 def read_essay(filename):
     filename = get_absolute_path(filename)
@@ -111,15 +107,15 @@ def write_paragraph_to_latex(sentence, results, output_file, dict_list):
         file.write("}}\\vspace{0.5cm}\\noindent\n\n")
         
         # Add the word list and explanations
-
-        file.write(f"\\textbf{{Word:}} {word_string}\\\\\n\n")
+        if len(word_list) > 0:
+            file.write(f"\\textbf{{Word:}} {word_string}\\\\\n\n")
     for result in results:
         if result_exist(result):
             write_word_to_latex(result, output_file, dict_list)
             
 def write_word_to_latex(result_dict, output_file, dict_list):
     with open(output_file, 'a', encoding='utf-8') as file:
-        file.write("\\clearpage\n\\noindent\n")
+        # file.write("\\clearpage\n\\noindent\n")
         for i in range(len(dict_list)):
             if result_dict['result'][i] == -1:
                 continue
@@ -150,11 +146,9 @@ def symbols_to_latex(text):
         
     return cleaned_text
 
-def generate_pdf_from_html_string(html_content, output_pdf):
+def generate_pdf_from_html_string(html_content, output_pdf, base_url=None):
     # Create an HTML object from a string
-    html = HTML(string=html_content, base_url="assets\Dictionaries\Vocabulary")
-    
-    # Write the PDF to the specified file
+    html = HTML(string=html_content, base_url=base_url)
     html.write_pdf(target=output_pdf)
 
 
