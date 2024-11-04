@@ -5,6 +5,16 @@
 \usepackage{lipsum} % For placeholder text, can be removed
 \usepackage{fancyhdr} % For headers and footers
 \usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{multicol}
+% \columnseprule=1pt
+
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[LE,RO]{\thepage} % Even pages: left side has page number; Odd pages: right side has page number
+\fancyhead[RE,LO]{Chapter \thechapter} % Even pages: right side has chapter index; Odd pages: left side has chapter index
+\pagestyle{fancy} % Apply the fancy style
+
+% Ensure chapter index (number) updates appropriately
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter}{}}
 
 % === Preamble Style Definitions ===
 \usepackage{xcolor}
@@ -39,8 +49,8 @@
 \definecolor{examplecolor}{rgb}{0, 0, 0}
 \definecolor{headingcolor}{rgb}{0, 0, 0}
 
-\newcommand{\booktitle}{English Reading Notes}
-\newcommand{\authorname}{Author Name}
+\newcommand{\booktitle}{A Little History of the Word}
+\newcommand{\authorname}{E.H. Gombrich}
 \newcommand{\yourname}{Nephrite}
 
 \begin{document}
@@ -78,8 +88,32 @@
 \newpage
 
 % Main content from external files
-\chapter{Some difficult sentences in papers}
+% \chapter{Some difficult sentences in papers}
 
 \input{../Contents/reading} % This will include the main text and notes
 
+
+\newpage
+% Back cover starts here
+\begin{titlepage}
+\begin{center}
+\vfill
+
+% Optional:: Add an image or graphic at the top
+% \includegraphics[width=0.5\textwidth]{path/to/image.png}
+
+% Optional: Add a quote, a summary, a logo, or anything suitable
+{\Large\textit{"Study the past if you would define the future."}}
+
+\vfil
+
+% Optional: Add author's name or any other details
+\textcolor{gray}{\large Compiled by \yourname}
+\vspace{1cm}
+
+% More sophisticated graphics could include a QR code or similar
+
+\vfill
+\end{center}
+\end{titlepage}
 \end{document}

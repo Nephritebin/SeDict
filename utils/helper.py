@@ -11,6 +11,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk import pos_tag
 
+
 # Make sure to download the necessary resources for NLTK
 # If you haven't downloaded them yet, uncomment the following lines
 # nltk.download('punkt_tab')
@@ -93,25 +94,46 @@ def add_around_substring(text, target, prefix, suffix):
     modified_text = text.replace(target, f'{prefix}{target}{suffix}')
     return modified_text
 
+from utils.personal import check_whether_paragraph_is_section_title
+
 def write_paragraph_to_latex(sentence, results, output_file, dict_list):
     with open(output_file, 'a', encoding='utf-8') as file:
         
-        word_list = [result['word'] for result in results if result_exist(result)]
-        for i in word_list:
-            sentence = add_around_substring(sentence, i, '\\textbf{', '}')
-        word_string = ', '.join(word_list)
-        
+        if not check_whether_paragraph_is_section_title(sentence):
+            word_list = [result['word'] for result in results if result_exist(result)]
+            for i in word_list:
+                sentence = add_around_substring(sentence, i, '\\textbf{', '}')
+            word_string = ', '.join(word_list)
+            
+            # file.write("\\clearpage\n\\noindent\n")
+            
+            file.write("\\colorbox{bgcolor}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\n")        
+            file.write(f"{sentence}\n")
+            file.write("}}\\vspace{0.5cm}\\noindent\n\n")
+            
+            # Add the word list and explanations
+            if len(word_list) > 0:
+                file.write(f"\\textbf{{Word:}} {word_string}\\\\\n\n")
+        else:
+            file.write("\\clearpage\n\\noindent\n")
+            file.write(f"\\chapter{{{sentence}}}\n\n")
+    # for result in results:
+    #     if result_exist(result):
+    #         write_word_to_latex(result, output_file, dict_list)
+    
+def write_word_appendix(current_words, output_file):
+    words = current_words
+    with open(output_file, 'a', encoding='utf-8') as file:
         file.write("\\clearpage\n\\noindent\n")
-        file.write("\\colorbox{bgcolor}{\\parbox{\\dimexpr\\linewidth-2\\fboxsep}{\n")        
-        file.write(f"{sentence}\n")
-        file.write("}}\\vspace{0.5cm}\\noindent\n\n")
+        file.write("\\fancyhead[LE,RO]{\\thepage}\n")
+        file.write("\\fancyhead[RE,LO]{Appendix \\thechapter} \n")
+        file.write("\\appendix")
         
-        # Add the word list and explanations
-        if len(word_list) > 0:
-            file.write(f"\\textbf{{Word:}} {word_string}\\\\\n\n")
-    for result in results:
-        if result_exist(result):
-            write_word_to_latex(result, output_file, dict_list)
+        file.write("\\chapter{Word Lists}\n\n")
+        file.write("\\begin{multicols}{4}\n")
+        for i in words:
+            file.write(f"{i}\n\n")
+        file.write("\\end{multicols}\n")
             
 def write_word_to_latex(result_dict, output_file, dict_list):
     with open(output_file, 'a', encoding='utf-8') as file:

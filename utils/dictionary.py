@@ -37,7 +37,7 @@ class Dictionary:
         try:
             wordIndex = self.headwords.index(word.encode())
         except ValueError:
-            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            # print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1  #
         word, html = self.items[wordIndex]
         word, html = word.decode(), html.decode()
@@ -113,7 +113,7 @@ class VocabularyDictionary(Dictionary):
         ai_elements = soup.find_all(class_='a i')
         
         if len(its_elements) == 0 or len(ai_elements) == 0:
-            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            # print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1
         if len(its_elements) != 1 or len(ai_elements) != 1:
             # print(html)
@@ -150,7 +150,7 @@ class LongmanDictionary(Dictionary):
         # Extract the word name
         word = soup.find('h1', class_='pagetitle')
         if word is None:
-            print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
+            # print(f"The word \'{word}\' is not found in the {self.dictionary_name} dictionary.")
             return -1
         word = word.text
         
@@ -242,8 +242,6 @@ class OxfordDictionary(Dictionary):
     def __init__(self, filename):
         super().__init__(filename)
         self.attributes = ['meaning', 'explanation']
-        
-    def _parse_html(self, html, word):
-        return super()._parse_html_to_pdf(html, word)
+
         
 

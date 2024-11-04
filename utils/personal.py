@@ -1,3 +1,5 @@
+import os, sys
+
 import nltk
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
@@ -9,6 +11,20 @@ from utils.helper import *
 
 # Here are some functions you can defined by yourself.
 
+def check_whether_paragraph_is_valid(paragraph):
+    words = word_tokenize(paragraph)
+    pos_tags = pos_tag(words)
+    words = [(word.lower(), pos) for word, pos in pos_tags if word.isalpha()]
+    if len(words) > 0:
+        return True
+    return False
+
+def are_all_letters_uppercase(s):
+    # Filter out non-alphabetic characters, then check if remaining are all uppercase
+    return all(char.isupper() for char in s if char.isalpha())
+
+def check_whether_paragraph_is_section_title(paragraph):
+    return are_all_letters_uppercase(paragraph)
 
 def read_paragraph(sentence):
     words = word_tokenize(sentence)
@@ -21,7 +37,9 @@ def read_paragraph(sentence):
 
 # Define a function to filter the words
 # You can load your own learned words list from assets
+print(os.getcwd())
 learned_words = load_learned_words('assets/Materials/learned_words.txt')
+wired_words = load_learned_words('assets/Materials/wired_words.txt')
 
 # Define the threshold for the words
 # Noun, Verb, Adjective, Adverb, Conjunction
@@ -29,10 +47,12 @@ threshold = {'n': 5000, 'v': 3000, 'j': 3000, 'r': 3000, 'c': 1000}
 
 
 def word_filter(word, coca, current_words):
-    # Define the words to be filtered
+    # Define the words to be filtered manually
     if word in learned_words:
         return False
     if word in current_words:
+        return False
+    if word in wired_words:
         return False
     
     # Not be able to find the word in the COCA dataset

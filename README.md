@@ -15,12 +15,12 @@ conda install -c conda-forge weasyprint
 
 ### Bug Fix
 
+If you meet the following error:
+
 ```
-  File "D:\Programs\Anaconda\envs\test2\lib\site-packages\weasyprint\pdf\stream.py", line 61, in __init__
-    in md5(description_string, usedforsecurity=False).digest()[:6])
 TypeError: openssl_md5() takes at most 1 argument (2 given)
 ```
-
+Please follow the error information and change the lines using `md5` function:
 ```
 in md5(description_string).
 ```
